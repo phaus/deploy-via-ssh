@@ -11,6 +11,7 @@ services:
   deployment:
     image: $APP_DEPLOY_IMAGE
     container_name: $APP_DEPLOY_NAME
+    volumes:
       - data:/data
     networks:
       - traefik_default
