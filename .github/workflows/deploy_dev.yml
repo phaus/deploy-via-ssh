@@ -31,7 +31,7 @@ jobs:
           ssh-keyscan -p 24 ${{ secrets.ARTIFACT_HOST }} >> ~/.ssh/known_hosts
       - name: Upload docker compose
         run: |
-          scp compose.yml -P ${{ secrets.ARTIFACT_PORT }} ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }}:/home/ ${{ secrets.ARTIFACT_USER }}/
+          scp compose.yml -P ${{ secrets.ARTIFACT_PORT }} ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }}:/home/${{ secrets.ARTIFACT_USER }}/
 
       - name: Test SSH
         run: |
