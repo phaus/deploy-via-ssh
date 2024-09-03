@@ -9,7 +9,7 @@ on:
       - main
 env:
   DEPLOYMENT_FOLDER: 'via-ssh-dev'
-
+  SSH_PORT: 24
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,18 +26,17 @@ jobs:
           bash scripts/prepare-docker-compose.sh > compose.yml
       - name: Set up SSH key
         run: |
-          env
           mkdir -p ~/.ssh
           echo "${{ secrets.ARTIFACT_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p 24 ${{ secrets.ARTIFACT_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -p ${SSH_PORT} ${{ secrets.ARTIFACT_HOST }} >> ~/.ssh/known_hosts
       - name: Prepare dev deployment
         run: |
-          ssh -i ~/.ssh/id_rsa -p 24 ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} mkdir -p ${DEPLOYMENT_FOLDER}
+          ssh -i ~/.ssh/id_rsa -p ${SSH_PORT} ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} mkdir -p ${DEPLOYMENT_FOLDER}
       - name: Upload docker compose
         run: |
-          scp -P 24 compose.yml ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }}:/home/${{ secrets.ARTIFACT_USER }}/${DEPLOYMENT_FOLDER}/
+          scp -P ${SSH_PORT} compose.yml ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }}:/home/${{ secrets.ARTIFACT_USER }}/${DEPLOYMENT_FOLDER}/
       - name: Test SSH
         run: |
-          ssh -i ~/.ssh/id_rsa -p 24 ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} docker compose -f ${DEPLOYMENT_FOLDER}/compose.yml pull
-          ssh -i ~/.ssh/id_rsa -p 24 ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} docker compose -f ${DEPLOYMENT_FOLDER}/compose.yml up -d
+          ssh -i ~/.ssh/id_rsa -p ${SSH_PORT} ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} docker compose -f ${DEPLOYMENT_FOLDER}/compose.yml pull
+          ssh -i ~/.ssh/id_rsa -p ${SSH_PORT} ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} docker compose -f ${DEPLOYMENT_FOLDER}/compose.yml up -d
