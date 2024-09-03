@@ -14,7 +14,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+      - name: Prepare docker compose
+        run: |
+          sed 's/##image##/ghcr.io/${{ github.repository }}-app:${{ github.sha }}/g' templates/compose.yml > compose.yml
       - name: Set up SSH key
         run: |
           env
@@ -22,7 +24,10 @@ jobs:
           echo "${{ secrets.ARTIFACT_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 24 ${{ secrets.ARTIFACT_HOST }} >> ~/.ssh/known_hosts
+      - name: Upload docker compose
+        run: |
+          scp compose.yml -P ${{ secrets.ARTIFACT_PORT }} ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }}:/home/ ${{ secrets.ARTIFACT_USER }}/
 
       - name: Test SSH
         run: |
-          ssh -i ~/.ssh/id_rsa -p ${{ secrets.ARTIFACT_PORT }} ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} ls -al
+          ssh -i ~/.ssh/id_rsa -p ${{ secrets.ARTIFACT_PORT }} ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} docker compose pull
