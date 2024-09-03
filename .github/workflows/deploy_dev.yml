@@ -7,6 +7,8 @@ on:
       - completed
     branches:
       - main
+env:
+  DEPLOYMENT_FOLDER: 'via-ssh-dev'
 
 jobs:
   deploy:
@@ -29,10 +31,13 @@ jobs:
           echo "${{ secrets.ARTIFACT_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p 24 ${{ secrets.ARTIFACT_HOST }} >> ~/.ssh/known_hosts
+      - name: Prepare dev deployment
+        run: |
+          ssh -i ~/.ssh/id_rsa -p 24 ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} mkdir -p $DEPLOYMENT_FOLDER
       - name: Upload docker compose
         run: |
-          scp -P 24 compose.yml ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }}:/home/${{ secrets.ARTIFACT_USER }}/
-
+          scp -P 24 compose.yml ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }}:/home/${{ secrets.ARTIFACT_USER }}/$DEPLOYMENT_FOLDER/
       - name: Test SSH
         run: |
-          ssh -i ~/.ssh/id_rsa -p 24 ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} docker compose pull
+          ssh -i ~/.ssh/id_rsa -p 24 ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} docker compose -f $DEPLOYMENT_FOLDER pull
+          ssh -i ~/.ssh/id_rsa -p 24 ${{ secrets.ARTIFACT_USER }}@${{ secrets.ARTIFACT_HOST }} docker compose -f $DEPLOYMENT_FOLDER up -d
