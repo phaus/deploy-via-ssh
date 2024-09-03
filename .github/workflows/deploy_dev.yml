@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Prepare docker compose
         run: |
-          sed 's/##image##/ghcr.io/${{ github.repository }}-app:${{ github.sha }}/g' templates/compose.yml > compose.yml
+          sed -e 's/##image##/ghcr.io/${{ github.repository }}-app:${{ github.sha }}/g' templates/compose.yml > compose.yml
       - name: Set up SSH key
         run: |
           env
