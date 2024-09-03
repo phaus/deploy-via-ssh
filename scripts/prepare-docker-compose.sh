@@ -1,13 +1,10 @@
 #!/bin/sh
 cat << EOF
-version: "3"
-
 networks:
   traefik_default:
     external: true
 
 volumes:
-  config:
   data:
 
 services:
