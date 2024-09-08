@@ -20,6 +20,8 @@ jobs:
       packages: write
     timeout-minutes: 60
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Prepare
         run: |
           platform=${{ matrix.platform }}
