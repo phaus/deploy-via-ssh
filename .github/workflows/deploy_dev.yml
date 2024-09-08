@@ -10,7 +10,7 @@ on:
 env:
   APP_DEPLOY_NAME: deploy-via-ssh
   APP_URL: ${{ secrets.APP_URL }}
-  APP_DEPLOY_IMAGE: ghcr.io/${{ github.repository }}
+  APP_DEPLOY_IMAGE: ghcr.io/${{ github.repository }}:main
   APP_PORT: 80
   DEPLOYMENT_FOLDER: 'via-ssh-dev'
   SSH_PORT: 24
