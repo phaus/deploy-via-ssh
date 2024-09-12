@@ -1,12 +1,11 @@
 name: Deploy to Dev
 
 on:
-  workflow_run:
-    workflows: ["Build"]
-    types:
-      - completed
-    tags:
-      - '*'
+  push:
+    # Pattern matched against refs/tags
+    tags:        
+      - '*'           # Push events to every tag not containing /
+
 env:
   REGISTRY_IMAGE: ghcr.io/${{ github.repository }}
   APP_DEPLOY_NAME: deploy-via-ssh
